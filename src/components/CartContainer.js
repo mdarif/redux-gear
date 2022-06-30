@@ -1,9 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CartItem from './CartItem'
 import { connect } from 'react-redux'
 
 const CartContainer = ({ cart = [], total, dispatch }) => {
-  // console.log('cart', cart)
+  useEffect(() => {
+    dispatch({
+      type: 'GET_TOTALS'
+    })
+  })
+
   if (cart.length === 0) {
     return (
       <section className='cart'>
@@ -45,6 +50,21 @@ const CartContainer = ({ cart = [], total, dispatch }) => {
     </section>
   )
 }
+
+/**
+ * connect()
+ * The connect() function connects a React component to a Redux store.
+ *
+ * Params:
+ * mapStateToProps?: Function
+ * mapDispatchToProps?: Function | Object
+ * mergeProps?: Function
+ * options?: Object
+ *
+ * If a mapStateToProps function is specified, the new wrapper component will
+ * subscribe to Redux store updates. This means that any time the store is updated,
+ * mapStateToProps will be called.
+ */
 
 function mapStateToProps (store) {
   const { cart, total } = store // destructure the cart and total from main store object

@@ -1,18 +1,11 @@
 import React from 'react'
 import Navbar from './components/Navbar'
 import CartContainer from './components/CartContainer'
-import cartItems from './cart-items'
 
 // redux stuff
 import { createStore } from 'redux'
 import reducer from './reducer'
 import { Provider } from 'react-redux'
-
-const initialStore = {
-  cart: cartItems,
-  total: 100,
-  amount: 5
-}
 
 /**
  * createStore(reducer, [preloadedState], [enhancer])
@@ -27,7 +20,7 @@ const initialStore = {
  * reducer (Function): A reducing function that returns the next state tree,
  * given the current state tree and an action to handle.
  */
-const store = createStore(reducer, initialStore)
+const store = createStore(reducer)
 
 /**
  * dispatch(action)
