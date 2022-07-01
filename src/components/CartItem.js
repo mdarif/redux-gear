@@ -65,7 +65,7 @@ const CartItem = ({ img, title, price, amount, remove, toggle }) => {
  */
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const { id, amount } = ownProps
+  const { id } = ownProps
   return {
     remove: () => dispatch(removeItem(id)),
     // increase: () => dispatch(increaseItem(id)),

@@ -20,7 +20,10 @@ import { Provider } from 'react-redux'
  * reducer (Function): A reducing function that returns the next state tree,
  * given the current state tree and an action to handle.
  */
-const store = createStore(reducer)
+const store = createStore(
+  reducer,
+  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+)
 
 /**
  * dispatch(action)

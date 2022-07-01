@@ -7,7 +7,7 @@ const CartContainer = ({ cart = [], total, dispatch }) => {
     dispatch({
       type: 'GET_TOTALS'
     })
-  })
+  }, [cart, dispatch])
 
   if (cart.length === 0) {
     return (
