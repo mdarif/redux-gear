@@ -1,68 +1,118 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Redux Overview
 
-## Available Scripts
+## What is Redux?
 
-In the project directory, you can run:
+Redux is a pattern and library for managing and updating application state, using events called "actions".
 
-### `npm start`
+It serves as a centralized store for state that needs to be used across your entire application, with rules ensuring that the state can only be updated in a predictable fashion.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## When Should I Use Redux?
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+Redux helps you deal with shared state management, but like any tool, it has tradeoffs. There are more concepts to learn, and more code to write. It also adds some indirection to your code, and asks you to follow certain restrictions. It's a trade-off between short term and long term productivity.
 
-### `npm test`
+Redux is more useful when:
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- You have large amounts of application state that are needed in many places in the app
+- The app state is updated frequently over time
+- The logic to update that state may be complex
+- The app has a medium or large-sized codebase, and might be worked on by many people
 
-### `npm run build`
+## The Redux Store
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The center of every Redux application is the **store**. A "store" is a container that holds your application's global **state**.
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+A store is a JavaScript object with a few special functions and abilities that make it different than a plain global object:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- You must never directly modify or change the state that is kept inside the Redux store
+- Instead, the only way to cause an update to the state is to create a plain **action** object that describes "something that happened in the application", and then **dispatch** the action to the store to tell it what happened.
+- When an action is dispatched, the store runs the root **reducer** function, and lets it calculate the new state based on the old state and the action
+- Finally, the store notifies **subscribers** that the state has been updated so the UI can be updated with the new data.
 
-### `npm run eject`
+## Data Flow
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+We can summarize the flow of data through a Redux app with this diagram. It represents how:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- actions are dispatched in response to a user interaction like a click
+- the store runs the reducer function to calculate a new state
+- the UI reads the new state to display the new values
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+![](https://redux.js.org/assets/images/ReduxDataFlowDiagram-49fa8c3968371d9ef6f2a1486bd40a26.gif)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+## Redux Terminology
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+There's some important Redux terms that you'll need to be familiar with:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Actions
 
-### Code Splitting
+An action is a plain JavaScript object that has a `type` field. **You can think of an action as an event that describes something that happened in the application**.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+```
+const addTodoAction = {
+  type: 'todos/todoAdded',
+  payload: 'Buy milk'
+}
+```
 
-### Analyzing the Bundle Size
+### Reducers
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+A **reducer** is a function that receives the current `state` and an `action` object, decides how to update the state if necessary, and returns the new state: `(state, action) => newState`. **You can think of a reducer as an event listener which handles events based on the received action (event) type.**
 
-### Making a Progressive Web App
+Reducers must always follow some specific rules:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+- They should only calculate the new state value based on the state and action arguments
+- They are not allowed to modify the existing state. Instead, they must make immutable updates, by copying the existing state and making changes to the copied values.
+- They must not do any asynchronous logic, calculate random values, or cause other "side effects"
 
-### Advanced Configuration
+The logic inside reducer functions typically follows the same series of steps:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+- Check to see if the reducer cares about this action
+  - If so, make a copy of the state, update the copy with new values, and return it
+- Otherwise, return the existing state unchanged
 
-### Deployment
+A small example of a reducer, showing the steps that each reducer should follow:
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+```
+const initialState = { value: 0 }
 
-### `npm run build` fails to minify
+function counterReducer(state = initialState, action) {
+  // Check to see if the reducer cares about this action
+  if (action.type === 'counter/incremented') {
+    // If so, make a copy of `state`
+    return {
+      ...state,
+      // and update the copy with the new value
+      value: state.value + 1
+    }
+  }
+  // otherwise return the existing state unchanged
+  return state
+}
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Store
+
+The current Redux application state lives in an object called the **store**.
+
+The store is created by passing in a reducer, and has a method called `getState` that returns the current state value:
+
+```
+import { createStore } from 'redux'
+// Create a Redux store holding the state of your app.
+// Its API is { subscribe, dispatch, getState }.
+let store = createStore(counterReducer)
+console.log(store.getState())
+```
+
+## Dispatch
+
+The Redux store has a method called `dispatch`. **The only way to update the state is to call `store.dispatch()` and pass in an action object**. The store will run its reducer function and save the new state value inside, and we can call `getState()` to retrieve the updated value:
+
+```
+store.dispatch({ type: 'counter/incremented' })
+
+console.log(store.getState())
+// {value: 1}
+```
+
+**You can think of dispatching actions as "triggering an event"** in the application. Something happened, and we want the store to know about it. **Reducers act like event listeners**, and when they hear an action they are interested in, they update the state in response.

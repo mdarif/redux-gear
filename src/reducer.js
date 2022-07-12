@@ -1,16 +1,23 @@
 import cartItems from './cart-items'
 
+// Define an initial state value for the app
 const initialStore = {
   cart: cartItems,
   total: 0,
   amount: 0
 }
 
+// Create a "reducer" function that determines what the new state
+// should be when something happens in the app
 export default function reducer (state = initialStore, action) {
-  switch (action.type) {
+  // Reducers usually look at the type of action that happened
+  // to decide how to update the state
+  switch (
+    action.type //Action objects always have a type field, which is a string you provide that acts as a unique name for the action.
+  ) {
     case 'CLEAR_CART': {
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         cart: []
       }
     }
@@ -22,7 +29,7 @@ export default function reducer (state = initialStore, action) {
         return cartItem
       })
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         cart: tempCart
       }
     }
@@ -34,13 +41,13 @@ export default function reducer (state = initialStore, action) {
         return cartItem
       })
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         cart: tempCart
       }
     }
     case 'REMOVE': {
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         cart: state.cart.filter(cartItem => cartItem.id !== action.payload.id)
       }
     }
@@ -57,14 +64,14 @@ export default function reducer (state = initialStore, action) {
       )
       total = Number(total.toFixed(2))
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         total,
         amount
       }
     }
     case 'TOGGLE_AMOUNT':
       return {
-        ...state,
+        ...state, // update the state immutably by copying the existing state
         cart: state.cart.map(cartItem => {
           let add = cartItem.amount + 1
           let subtract = cartItem.amount - 1
@@ -78,6 +85,8 @@ export default function reducer (state = initialStore, action) {
         })
       }
     default:
+      // If the reducer doesn't care about this action type,
+      // return the existing state unchanged
       return state
   }
 }
